@@ -1,0 +1,46 @@
+getIDN {
+    out "*IDN?";
+    in "%\$1[^\r\n]";
+    ExtraInput = Ignore;
+}
+
+cmd {
+    out "\$1";
+}
+
+setD {
+    out "\$1 %d";
+}
+getCurrent {
+    out "MEAS:CURR?";
+    in "%f";
+    ExtraInput = Ignore;
+}
+
+setCurrent {
+    out "SOUR:CURR \$1"
+}
+setVoltage {
+    out "SOUR:VOLT \$1"
+}
+setPow {
+    out "SOUR:VOLT \$1"
+}
+getVoltage {
+    out "MEAS:VOLT?";
+    in "%f";
+    ExtraInput = Ignore;
+}
+
+getPower {
+    out "MEAS:POW?";
+    in "%f";
+    ExtraInput = Ignore;
+}
+
+getStatus {
+    out "DIAG:DISP:IND?";
+    in "%d";
+    ExtraInput = Ignore;
+}
+

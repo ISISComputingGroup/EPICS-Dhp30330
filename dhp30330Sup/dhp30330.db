@@ -1,0 +1,165 @@
+record(bo, "$(P)SIM")
+{
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(VAL, "$(RECSIM=0)")
+    field(PINI, "YES")
+}
+
+record(bo, "$(P)DISABLE")
+{
+    field(DESC, "Disable comms")
+    field(PINI, "YES")
+    field(VAL, "$(DISABLE=0)")
+    field(OMSL, "supervisory")
+    field(ZNAM, "COMMS ENABLED")
+    field(ONAM, "COMMS DISABLED")
+}
+
+record(ai, "$(P)CURR") {
+    field(DESC, "Current")
+    field(SCAN, "1 second")
+    field(INP,  "getCurrent")
+}
+
+record(ao, "$(P)CURR:SP") {
+    field(DESC, "Current Set Point")
+}
+
+record(ai, "$(P)VOLT") {
+    field(DESC, "Current")
+    field(SCAN, "1 second")
+    field(INP,  "getVoltage")
+}
+
+record(ao, "$(P)VOLT:SP") {
+    field(DESC, "Voltage Set Point")
+}
+
+record(ai, "$(P)POW") {
+    field(DESC, "Current")
+    field(SCAN, "1 second")
+    field(INP,  "getPower")
+}
+
+record(ao, "$(P)POW:SP") {
+    field(DESC, "Power Set Point")
+}
+
+record(calc, "$(P)POW:CALC") {
+    field(DESC, "Calculated Power")
+    field(CALC, "a*b")
+    field(INPA, "$(P)CURR CP MS")
+    field(INPB, "$(P)VOLT CP MS")
+}
+
+record(ao, "$(P)POW:TOLERANCE") {
+    field(DESC, "The power tolerance")
+    field(PREC, "2")
+    field(EGU,  "%")
+    field(VAL,  "3.00")
+}
+
+record(calc, "$(P)POW:HIGH") {
+    field(DESC, "High Limit for power")
+    field(CALC, "((a/100)+1)*b")
+    field(INPA, "$(P)POW:TOLERANCE")
+    field(INPB, "$(P)POW:SP")
+}
+
+record(calc, "$(P)POW:LOW") {
+    field(DESC, "Low Limit for power")
+    field(CALC, "(1-(a/100))*b")
+    field(INPA, "$(P)POW:TOLERANCE")
+    field(INPB, "$(P)POW:SP")
+}
+
+record(calc, "$(P)COERCED:POW") {
+    field(DESC, "Coerced Power")
+    field(CALC, "MAX(MIN(a,b),c)")
+    field(INPA, "$(P)POW:CALC CP MS")
+    field(INPB, "$(P)POW:HIGH CP MS")
+    field(INPC, "$(P)POW:LOW CP MS")
+    
+}
+
+record(calc, "$(P)COERCED:PMAX") {
+    field(DESC, "Coerced Power Max")
+    field(CALC, "(FLOOR(a/10)*10)+20")
+    field(INPA, "$(P)POW:CALC CP MS")
+}
+
+record(calc, "$(P)VOLT:ADJUST"){
+    field(DESC, "Adjusted Power")
+    field(CALC, "a>b?c+d:c-d")
+    field(INPA, "$(P)POW:SP CP MS")
+    field(INPB, "$(P)COERCED:POW CP MS")
+    field(INPC, "$(P)VOLT CP MS")
+    field(INPD, "$(P)DELTAV CP MS")
+}
+
+record(calc, "$(P)CURRENT:ADJUST"){
+    field(DESC, "Adjusted Power")
+    field(CALC, "a>b?c+10:c")
+    field(INPA, "$(P)POW:SP CP MS")
+    field(INPB, "$(P)COERCED:POW CP MS")
+    field(INPC, "$(P)CURRENT CP MS")
+}
+
+record(ao, "$(P)DELTAV") {
+    field(DESC, "Amount to adjust voltage by.")
+    field(VAL,  "0.1")    
+}
+
+record(calc, "$(P)RESISTANCE:CALC") {
+    field(DESC, "Calculated Resistance")
+    field(CALC, "(b)/a+0.000001")
+    field(INPA, "$(P)CURR CP MS")
+    field(INPB, "$(P)VOLT CP MS")
+}
+
+record(stringin, "$(P)STATUS_RAW") {
+    field(DESC, "The results of querying status")
+    field(SCAN, "1 second")
+    field(INP,  "getStatus")
+}
+
+record(scalcout, "$(P)STATUS") {
+    field(DESC, "Remove ',' from status")
+    field(CALC, "aa-','")
+    field(INAA, "$(P)STATUS_RAW CP MS")
+}
+
+record(mbbiDirect, "$(P)STA")
+{
+    field(DESC, "Status Flags")
+	field(INP, "$(P)STATUS CP MS")
+	field(DTYP, "Raw Soft Channel")
+}
+
+record(calcout, "$(P)STATUS:CURR")
+{
+    field(INPA, "$(P)STA1.B0 CP MS")
+	field(CALC, "A")
+}
+
+record(calcout, "$(P)STATUS:VOLT")
+{
+    field(INPA, "$(P)STA1.B1 CP MS")
+	field(CALC, "A")
+}
+
+record(calcout, "$(P)STATUS:POW")
+{
+    field(INPA, "$(P)STA1.B2 CP MS")
+	field(CALC, "A")
+}
+
+record(calcout, "$(P)STATUS:REMOTE")
+{
+    field(INPA, "$(P)STA1.B3 CP MS")
+	field(CALC, "A")
+}
+
