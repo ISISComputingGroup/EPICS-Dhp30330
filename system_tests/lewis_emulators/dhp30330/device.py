@@ -1,14 +1,27 @@
-from lewis.core.logging import has_log
+from collections import OrderedDict
+from .states import DefaultState
 from lewis.devices import StateMachineDevice
 
-@has_log
-class Simulateddhp30330(StateMachineDevice):
-    """
-    Simulated dhp30330 Power Supply
-    """
-    def _initalize_data(self):
+
+class SimulatedDhp30330(StateMachineDevice):
+
+    def _initialize_data(self):
+        """
+        Initialize all of the device's attributes.
+        """
         self.current = 0
         self.volt = 0
-        self. power = 0
+        self.power = 0
 
+    def _get_state_handlers(self):
+        return {
+            'default': DefaultState(),
+        }
+
+    def _get_initial_state(self):
+        return 'default'
+
+    def _get_transition_handlers(self):
+        return OrderedDict([
+        ])
 

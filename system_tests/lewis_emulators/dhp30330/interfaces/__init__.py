@@ -1,3 +1,3 @@
-from .stream_interface import DHP30330StreamInterface
+from .stream_interface import Dhp30330StreamInterface
 
-__all__ = ['DHP30330StreamInterface']
+__all__ = ['Dhp30330StreamInterface']
