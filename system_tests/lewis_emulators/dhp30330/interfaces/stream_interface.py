@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 from lewis.utils.replies import conditional_reply
@@ -14,14 +14,16 @@ class Dhp30330StreamInterface(StreamInterface):
         super(Dhp30330StreamInterface, self).__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
-            CmdBuilder("get_idn").escape("*IDN?").eos().build(),
-            CmdBuilder("get_current").escape("MEAS:CURR?").eos().build(),
-            CmdBuilder("get_current_limit").escape("SOUR:CURR?").eos().build(),
-            CmdBuilder("get_voltage").escape("MEAS:VOLT?").eos().build(),
-            CmdBuilder("get_voltage_limit").escape("SOUR:VOLT?").eos().build(),
-            CmdBuilder("get_power").escape("MEAS:POW?").eos().build(),
-            CmdBuilder("get_power_limit").escape("SOUR:POW?").eos().build(),
-            CmdBuilder("get_constants").escape("DIAG:DISP:IND?").build()
+            CmdBuilder(self.get_current).escape("MEAS:CURR?").eos().build(),
+            CmdBuilder(self.get_current_sp).escape("SOUR:CURR?").eos().build(),
+            CmdBuilder(self.get_voltage).escape("MEAS:VOLT?").eos().build(),
+            CmdBuilder(self.get_voltage_sp).escape("SOUR:VOLT?").eos().build(),
+            CmdBuilder(self.get_power).escape("MEAS:POW?").eos().build(),
+            CmdBuilder(self.get_power_sp).escape("SOUR:POW?").eos().build(),
+            CmdBuilder(self.get_status).escape("DIAG:DISP:IND?").build(),
+            CmdBuilder(self.set_current_sp).escape("SOUR:CURR").spaces(at_least_one=True).float().eos().build(),
+            CmdBuilder(self.set_voltage_sp).escape("SOUR:VOLT").spaces(at_least_one=True).float().eos().build(),
+            CmdBuilder(self.set_power_sp).escape("SOUR:POW").spaces(at_least_one=True).float().eos().build()
         }
 
     def handle_error(self, request, error):
@@ -35,27 +37,42 @@ class Dhp30330StreamInterface(StreamInterface):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
-    def get_idn(self):
-        return self._device.idn
-
+    @conditional_reply("connected")
     def get_current(self):
-        return str(self._device.current)
+        return f"{self.device.current}"
+    
+    @conditional_reply("connected")
+    def get_current_sp(self):
+        return f"{self.device.current_sp}"
 
+    @conditional_reply("connected")
     def get_voltage(self):
-        return str(self._device.voltage)
+        return f"{self.device.voltage}"
+    
+    @conditional_reply("connected")
+    def get_voltage_sp(self):
+        return f"{self.device.voltage_sp}"
 
+    @conditional_reply("connected")
     def get_power(self):
-        return str(self._device.power)
+        return f"{self.device.power}"
+    
+    @conditional_reply("connected")
+    def get_power_sp(self):
+        return f"{self.device.power_sp}"
 
-    def get_current_limit(self):
-        return str(self._device.current_limit)
+    @conditional_reply("connected")
+    def get_status(self):
+        return f"{self.device.constant_voltage},{self.device.constant_current},{self.device.constant_power},{self.device.remote}"
 
-    def get_voltage_limit(self):
-        return str(self._device.voltage_limit)
+    @conditional_reply("connected")
+    def set_current_sp(self, value):
+        self.device.current_sp = value
 
-    def get_power_limit(self):
-        return str(self._device.power_limit)
+    @conditional_reply("connected")
+    def set_voltage_sp(self, value):
+        self.device.voltage_sp = value
 
-    def get_constants(self):
-        return f"{self._device.current_bool}{self._device.voltage_bool}" \
-               f"{self._device.power_bool},{self._device.remote}"
+    @conditional_reply("connected")
+    def set_power_sp(self, value):
+        self.device.power_sp = value

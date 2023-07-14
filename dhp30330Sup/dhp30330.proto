@@ -1,33 +1,27 @@
-getIDN {
-    out "*IDN?";
-    in "%\$1[^\r\n]";
-    ExtraInput = Ignore;
-}
+Terminator = CR;
 
-cmd {
-    out "\$1";
-}
+############################################################
 
-setD {
-    out "\$1 %d";
-}
 getCurrent {
     out "MEAS:CURR?";
     in "%f";
     ExtraInput = Ignore;
 }
 
-setCurrent {
-    out "SOUR:CURR \$1"
+getCurrentLimit {
+    out "SOUR:CURR?";
+    in "%f";
+    ExtraInput = Ignore;
 }
-setVoltage {
-    out "SOUR:VOLT \$1"
-}
-setPow {
-    out "SOUR:VOLT \$1"
-}
+
 getVoltage {
     out "MEAS:VOLT?";
+    in "%f";
+    ExtraInput = Ignore;
+}
+
+getVoltageLimit {
+    out "SOUR:VOLT?";
     in "%f";
     ExtraInput = Ignore;
 }
@@ -38,9 +32,28 @@ getPower {
     ExtraInput = Ignore;
 }
 
-getStatus {
-    out "DIAG:DISP:IND?";
-    in "%d";
+getPowerLimit {
+    out "SOUR:POW?";
+    in "%f";
     ExtraInput = Ignore;
 }
 
+getStatus {
+    out "DIAG:DISP:IND?";
+    in "%d,%(\$1\$2)d,%(\$1\$3)d,%(\$1\$4)d";
+    ExtraInput = Ignore;
+}
+
+############################################################
+
+setCurrentLimit {
+    out "SOUR:CURR %f";
+}
+
+setVoltageLimit {
+    out "SOUR:VOLT %f";
+}
+
+setPowerLimit {
+    out "SOUR:POW %f";
+}
