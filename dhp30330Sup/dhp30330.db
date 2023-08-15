@@ -234,7 +234,7 @@ record(calc, "$(P)POW:CALC") {
 
 record(calc, "$(P)RES:CALC") {
     field(DESC, "Calculated Resistance")
-    field(CALC, "A/B")
+    field(CALC, "B#0?A/B:0")
     field(INPA, "$(P)VOLT CP MSS")
     field(INPB, "$(P)CURR CP MSS")
     info(INTEREST, "MEDIUM")
