@@ -37,7 +37,7 @@ record(calcout, "$(P)CHECK") {
     field(INPB, "$(P)VOLT")
     field(INPC, "$(P)CURR:PREV")
     field(INPD, "$(P)VOLT:PREV")
-    field(CALC, "(C#0)&&(D#0)&&(((A<(C*0.5))||(A>(C*2)))&&((B<(D*0.5))||(B>(D*2))))")
+    field(CALC, "(C#0)&&(D#0)&&((A<(C*0.5))||(A>(C*2))||(B<(D*0.5))||(B>(D*2)))")
     field(OUT,  "$(P)STOP.PROC PP")
     field(FLNK, "$(P)CURR:PREV PP")
 }
@@ -356,7 +356,7 @@ record(bi, "$(P)SIM:REMOTE") {
 
 
 
-
+    
 
 
 
