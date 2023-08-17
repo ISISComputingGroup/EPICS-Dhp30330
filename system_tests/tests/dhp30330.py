@@ -123,50 +123,51 @@ class Dhp30330Tests(unittest.TestCase):
         self.ca.assert_that_pv_is("RES:CALC", resistance)
 
     @parameterized.expand(parameterized_list([
-        (10, 10 * 3.0), # Overlimit.
-        (10, 10 * 0.2)  # Underlimit.
+        (10, 10 * 1.5), # Within limit (below).
+        (10, 10 * 0.8), # Within limit (above).
     ]))
-    def test_WHEN_stop_condition_triggered_THEN_all_set_to_zero(self, _, first, second):
-        self.ca.set_pv_value("CURR:SP", 1)
-        self.ca.set_pv_value("VOLT:SP", 1)
+    def test_WHEN_no_stop_condition_THEN_stop_pv_is_not_processed(self, _, first, second):
+        self.ca.set_pv_value("CURR:SP", 1, wait=True)
+        self.ca.set_pv_value("VOLT:SP", 1, wait=True)
 
         self._set("CURR", first)
         self._set("VOLT", first)
 
         time.sleep(5) # Wait for all periodic scan PVs to process.
 
-        self._set("CURR", second)
-        self._set("VOLT", second)
-
-        time.sleep(5) # Wait for all periodic scan PVs to process.
-
-        self.ca.assert_that_pv_is("CURR:SP:RBV", 0)
-        self.ca.assert_that_pv_is("VOLT:SP:RBV", 0)
-
-    @parameterized.expand(parameterized_list([
-        (2, 2 * 1.5, 2, 2 * 1.5), # Within limits for both.
-        (2, 2 * 0.2, 2, 2 * 1.5), # Current underlimit, voltage normal.
-        (2, 2 * 2.5, 2, 2 * 1.5), # Current overlimit, voltage normal.
-        (2, 2 * 1.5, 2, 2 * 0.2), # Current normal, voltage underlimit.
-        (2, 2 * 1.5, 2, 2 * 2.5), # Current normal, voltage overlimit.
-    ]))
-    def test_WHEN_no_stop_condition_THEN_stop_pv_is_not_processed(self, _, curr_first, curr_second, voltage_first, voltage_second):
-        self.ca.set_pv_value("CURR:SP", 1, wait=True)
-        self.ca.set_pv_value("VOLT:SP", 1, wait=True)
-
-        self._set("CURR", curr_first)
-        self._set("VOLT", voltage_first)
-
-        time.sleep(5) # Wait for all periodic scan PVs to process.
-
         with self.ca.assert_pv_not_processed("STOP"):
-            self._set("CURR", curr_second)
-            self._set("VOLT", voltage_second)
+            self._set("CURR", second)
+            self._set("VOLT", second)
 
             time.sleep(5) # Wait for all periodic scan PVs to process.
 
         self.ca.assert_that_pv_is("CURR:SP:RBV", 1)
         self.ca.assert_that_pv_is("VOLT:SP:RBV", 1)
+
+    @parameterized.expand(parameterized_list([
+        (2, 2 * 2.5, 2, 2 * 2.5), # Both overlimit.
+        (2, 2 * 0.2, 2, 2 * 0.2), # Both underlimit.
+        (2, 2 * 0.2, 2, 2 * 1.5), # Current underlimit, voltage normal.
+        (2, 2 * 2.5, 2, 2 * 1.5), # Current overlimit, voltage normal.
+        (2, 2 * 1.5, 2, 2 * 0.2), # Current normal, voltage underlimit.
+        (2, 2 * 1.5, 2, 2 * 2.5), # Current normal, voltage overlimit.
+    ]))
+    def test_WHEN_stop_condition_triggered_THEN_all_set_to_zero(self, _, curr_first, curr_second, volt_first, volt_second):
+        self.ca.set_pv_value("CURR:SP", 1)
+        self.ca.set_pv_value("VOLT:SP", 1)
+
+        self._set("CURR", curr_first)
+        self._set("VOLT", volt_first)
+
+        time.sleep(5) # Wait for all periodic scan PVs to process.
+
+        self._set("CURR", curr_second)
+        self._set("VOLT", volt_second)
+
+        time.sleep(5) # Wait for all periodic scan PVs to process.
+
+        self.ca.assert_that_pv_is("CURR:SP:RBV", 0)
+        self.ca.assert_that_pv_is("VOLT:SP:RBV", 0)
 
     def test_GIVEN_default_macros_set_WHEN_limits_read_THEN_limits_correct(self):
         current = 120
