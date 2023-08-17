@@ -67,12 +67,17 @@ class Dhp30330StreamInterface(StreamInterface):
 
     @conditional_reply("connected")
     def set_current_sp(self, value):
+        self.device.current = value
         self.device.current_sp = value
+        return ""
 
     @conditional_reply("connected")
     def set_voltage_sp(self, value):
+        self.device.voltage = value
         self.device.voltage_sp = value
+        return ""
 
     @conditional_reply("connected")
     def set_power_sp(self, value):
         self.device.power_sp = value
+        return ""

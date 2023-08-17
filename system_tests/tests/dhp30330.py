@@ -127,8 +127,8 @@ class Dhp30330Tests(unittest.TestCase):
         (10, 10 * 0.8), # Within limit (above).
     ]))
     def test_WHEN_no_stop_condition_THEN_stop_pv_is_not_processed(self, _, first, second):
-        self.ca.set_pv_value("CURR:SP", 1, wait=True)
-        self.ca.set_pv_value("VOLT:SP", 1, wait=True)
+        self.ca.set_pv_value("CURR:SP", first, wait=True)
+        self.ca.set_pv_value("VOLT:SP", first, wait=True)
 
         self._set("CURR", first)
         self._set("VOLT", first)
@@ -141,8 +141,8 @@ class Dhp30330Tests(unittest.TestCase):
 
             time.sleep(5) # Wait for all periodic scan PVs to process.
 
-        self.ca.assert_that_pv_is("CURR:SP:RBV", 1)
-        self.ca.assert_that_pv_is("VOLT:SP:RBV", 1)
+        self.ca.assert_that_pv_is("CURR:SP:RBV", first)
+        self.ca.assert_that_pv_is("VOLT:SP:RBV", first)
 
     @parameterized.expand(parameterized_list([
         (2, 2 * 2.5, 2, 2 * 2.5), # Both overlimit.
@@ -153,8 +153,8 @@ class Dhp30330Tests(unittest.TestCase):
         (2, 2 * 1.5, 2, 2 * 2.5), # Current normal, voltage overlimit.
     ]))
     def test_WHEN_stop_condition_triggered_THEN_all_set_to_zero(self, _, curr_first, curr_second, volt_first, volt_second):
-        self.ca.set_pv_value("CURR:SP", 1)
-        self.ca.set_pv_value("VOLT:SP", 1)
+        self.ca.set_pv_value("CURR:SP", curr_first)
+        self.ca.set_pv_value("VOLT:SP", volt_first)
 
         self._set("CURR", curr_first)
         self._set("VOLT", volt_first)
@@ -179,3 +179,46 @@ class Dhp30330Tests(unittest.TestCase):
             self.ca.assert_that_pv_is("CURR:SP:RBV", current)
             self.ca.assert_that_pv_is("VOLT:SP:RBV", voltage)
             self.ca.assert_that_pv_is("POW:SP:RBV", power)
+
+    @parameterized.expand(parameterized_list([
+        (  0,   0,  30,  60, 0.5,  50),  # Power needs adjusting up from 0
+        ( 30, 0.5,   0,  30,   0,  20),  # Power needs adjusting down to 0
+        (100, 4.4, 650, 140, 4.7, 690),  # Power needs adjusting up
+        (120, 5.4, 600, 120, 5.1, 640),  # Power needs adjusting down
+    ]))
+    def test_GIVEN_const_power_mode_on_WHEN_calculated_power_out_of_range_THEN_voltage_and_current_adjusted(self, _, curr, volt, power_limit, expected_curr_limit, expected_volt_limit, expected_power_limit):
+        self.ca.set_pv_value("CURR:REQ:SP", curr)
+        self.ca.set_pv_value("VOLT:REQ:SP", volt)
+        self._set("CURR", curr)
+        self._set("VOLT", volt)
+        
+        time.sleep(5)  # wait for curr, volt set to propagate before setting pow limit which by default triggers a single adjustment
+
+        self.ca.set_pv_value("POW:REQ:SP", power_limit)
+
+        time.sleep(2)
+        
+        self.ca.set_pv_value("CONST:POW:SP", 1)
+
+        timeout = 20
+        self.ca.assert_that_pv_is("CURR:SP:RBV", expected_curr_limit, timeout=timeout)
+        self.ca.assert_that_pv_is("VOLT:SP:RBV", expected_volt_limit, timeout=timeout)
+        self.ca.assert_that_pv_is("POW:SP:RBV", expected_power_limit, timeout=timeout)
+        self.ca.assert_that_pv_is("POW:WITHIN:TOLERANCE", 1, timeout=timeout)
+
+    def test_GIVEN_const_power_mode_off_WHEN_calculated_power_out_of_range_THEN_voltage_and_current_not_adjusted(self):
+        curr = 120
+        volt = 3.0
+
+        self.ca.set_pv_value("CURR:REQ:SP", curr)
+        self.ca.set_pv_value("VOLT:REQ:SP", volt)
+
+        with self.ca.assert_pv_not_processed("ADJUST"):
+            self._set("CURR", curr)
+            self._set("VOLT", volt)
+            
+            time.sleep(5)  # Wait for all periodic scan PVs to process.
+
+        self.ca.assert_that_pv_is("CURR", curr)
+        self.ca.assert_that_pv_is("VOLT", volt)
+        self.ca.assert_that_pv_is("POW:WITHIN:TOLERANCE", 0)
