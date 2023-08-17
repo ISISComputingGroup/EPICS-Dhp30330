@@ -47,13 +47,13 @@ getStatus {
 ############################################################
 
 setCurrentLimit {
-    out "SOUR:CURR %f";
+    out "SOUR:CURR %-5.2f";
 }
 
 setVoltageLimit {
-    out "SOUR:VOLT %f";
+    out "SOUR:VOLT %-5.2f";
 }
 
 setPowerLimit {
-    out "SOUR:POW %f";
+    out "SOUR:POW %-5.2f";
 }

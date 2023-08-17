@@ -21,9 +21,9 @@ class Dhp30330StreamInterface(StreamInterface):
             CmdBuilder(self.get_power).escape("MEAS:POW?").eos().build(),
             CmdBuilder(self.get_power_sp).escape("SOUR:POW?").eos().build(),
             CmdBuilder(self.get_status).escape("DIAG:DISP:IND?").build(),
-            CmdBuilder(self.set_current_sp).escape("SOUR:CURR").spaces(at_least_one=True).float().eos().build(),
-            CmdBuilder(self.set_voltage_sp).escape("SOUR:VOLT").spaces(at_least_one=True).float().eos().build(),
-            CmdBuilder(self.set_power_sp).escape("SOUR:POW").spaces(at_least_one=True).float().eos().build()
+            CmdBuilder(self.set_current_sp).escape("SOUR:CURR").spaces(at_least_one=True).float().spaces().eos().build(),
+            CmdBuilder(self.set_voltage_sp).escape("SOUR:VOLT").spaces(at_least_one=True).float().spaces().eos().build(),
+            CmdBuilder(self.set_power_sp).escape("SOUR:POW").spaces(at_least_one=True).float().spaces().eos().build()
         }
 
     def handle_error(self, request, error):
