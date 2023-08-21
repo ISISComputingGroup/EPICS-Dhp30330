@@ -1,0 +1,489 @@
+record(bo, "$(P)SIM") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(VAL, "$(RECSIM=0)")
+    field(PINI, "YES")
+}
+
+record(bo, "$(P)DISABLE") {
+    field(DESC, "Disable comms")
+    field(PINI, "YES")
+    field(VAL, "$(DISABLE=0)")
+    field(OMSL, "supervisory")
+    field(ZNAM, "COMMS ENABLED")
+    field(ONAM, "COMMS DISABLED")
+}
+
+############################################################
+
+record(dfanout, "$(P)STOP") {
+    field(DESC, "Set current, voltage and power to 0")
+    field(OMSL, "supervisory")
+    field(VAL,  "0")
+    field(OUTA, "$(P)CONST:POW:SP CA")
+    field(OUTB, "$(P)CURR:SP CA")
+    field(OUTC, "$(P)VOLT:SP CA")
+    field(OUTD, "$(P)POW:SP CA")
+}
+
+# If current and voltage are not within 50% and 200% of their previous values
+# process the STOP PV, setting all values to zero.
+record(calcout, "$(P)CHECK") {
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(OOPT, "When Non-zero")
+    field(INPA, "$(P)CURR")
+    field(INPB, "$(P)VOLT")
+    field(INPC, "$(P)CURR:PREV")
+    field(INPD, "$(P)VOLT:PREV")
+    field(CALC, "(C#0)&&(D#0)&&((A<(C*0.5))||(A>(C*2))||(B<(D*0.5))||(B>(D*2)))")
+    field(OUT,  "$(P)STOP.PROC PP")
+    field(FLNK, "$(P)CURR:PREV PP")
+}
+
+############################################################
+
+record(ai, "$(P)CURR") {
+    field(DTYP, "stream")
+    field(SCAN, "2 second")
+    field(INP,  "@dhp30330.proto getCurrent $(PORT)")
+    field(PREC, "0")
+    field(EGU, "A")
+    field(FLNK, "$(P)CHECK PP")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:CURR")
+    field(SDIS, "$(P)DISABLE")
+    info(ALARM, "DHP30330")
+    info(INTEREST, "HIGH")
+    info(ARCHIVE, "VAL")
+}
+
+record(dfanout, "$(P)CURR:REQ:SP") {
+    field(DESC, "Requested Current Limit setpoint")
+    field(OMSL, "Supervisory")
+    field(SELM, "All")
+    field(OUTA, "$(P)CURR:SP PP")
+}
+
+record(ao, "$(P)CURR:SP") {
+    field(DTYP, "stream")
+    field(OUT,  "@dhp30330.proto setCurrentLimit $(PORT)")
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_CURR_LIMIT)")
+    field(PREC, "0")
+    field(DRVH, "330")
+    field(DRVL, "0")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:CURR:SP")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "HIGH")
+    info(ARCHIVE, "VAL")
+}
+
+record(ai, "$(P)CURR:SP:RBV") {
+    field(DTYP, "stream")
+    field(SCAN, "2 second")
+    field(INP,  "@dhp30330.proto getCurrentLimit $(PORT)")
+    field(PREC, "0")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:CURR:SP:RBV")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+record(ai, "$(P)CURR:PREV") {
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(INP, "$(P)CHECK.A")
+    field(PREC, "0")
+    field(FLNK, "$(P)VOLT:PREV PP")
+}
+
+############################################################
+
+record(ai, "$(P)VOLT") {
+    field(DTYP, "stream")
+    field(SCAN, "2 second")
+    field(INP,  "@dhp30330.proto getVoltage $(PORT)")
+    field(PREC, "2")
+    field(EGU, "V")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:VOLT")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "HIGH")
+    info(ARCHIVE, "VAL")
+}
+
+record(dfanout, "$(P)VOLT:REQ:SP") {
+    field(DESC, "Requested Voltage Limit setpoint")
+    field(OMSL, "Supervisory")
+    field(SELM, "All")
+    field(PREC, "2")
+    field(OUTA, "$(P)VOLT:SP PP")
+}
+
+record(ao, "$(P)VOLT:SP") {
+    field(DTYP, "stream")
+    field(OUT,  "@dhp30330.proto setVoltageLimit $(PORT)")
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_VOLT_LIMIT)")
+    field(PREC, "2")
+    field(DRVH, "30")
+    field(DRVL, "0")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:VOLT:SP")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "HIGH")
+    info(ARCHIVE, "VAL")
+}
+
+record(ai, "$(P)VOLT:SP:RBV") {
+    field(DTYP, "stream")
+    field(SCAN, "2 second")
+    field(INP,  "@dhp30330.proto getVoltageLimit $(PORT)")
+    field(PREC, "2")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:VOLT:SP:RBV")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+record(ai, "$(P)VOLT:PREV") {
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(INP, "$(P)CHECK.B")
+    field(PREC, "2")
+}
+
+############################################################
+
+record(ai, "$(P)POW") {
+    field(DTYP, "stream")
+    field(SCAN, "2 second")
+    field(INP,  "@dhp30330.proto getPower $(PORT)")
+    field(PREC, "0")
+    field(EGU, "W")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:POW")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "HIGH")
+    info(ARCHIVE, "VAL")
+}
+
+record(dfanout, "$(P)POW:REQ:SP") {
+    field(DESC, "Requested Power Limit setpoint")
+    field(OMSL, "Supervisory")
+    field(SELM, "All")
+    field(OUTA, "$(P)POW:SP PP")
+    field(FLNK, "$(P)ADJUST:CHECK")
+}
+
+record(ao, "$(P)POW:SP") {
+    field(DTYP, "stream")
+    field(OUT,  "@dhp30330.proto setPowerLimit $(PORT)")
+    field(PINI, "YES")
+    field(VAL,  "$(DEFAULT_POW_LIMIT)")
+    field(PREC, "0")
+    field(DRVH, "10000")
+    field(DRVL, "0")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:POW:SP")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "HIGH")
+    info(ARCHIVE, "VAL")
+}
+
+record(ai, "$(P)POW:SP:RBV") {
+    field(DTYP, "stream")
+    field(SCAN, "2 second")
+    field(INP,  "@dhp30330.proto getPowerLimit $(PORT)")
+    field(PREC, "0")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:POW:SP:RBV")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+############################################################
+
+record(bi, "$(P)CONST:VOLT") {
+    field(DTYP, "stream")
+    field(SCAN, "2 second")
+    field(INP,  "@dhp30330.proto getStatus($(P),CONST:CURR,CONST:POW,REMOTE) $(PORT)")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(FLNK, "$(P)CONST:POW:CHECK.PROC PP")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:CONST:VOLT")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+record(bi, "$(P)CONST:CURR") {
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:CONST:CURR")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+record(bi, "$(P)CONST:POW") {
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:CONST:POW")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+record(bi, "$(P)REMOTE") {
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(SIML, "$(P)SIM")
+    field(SIOL, "$(P)SIM:REMOTE")
+    field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+############################################################
+
+record(calc, "$(P)POW:CALC") {
+    field(DESC, "Calculated Power")
+    field(CALC, "a*b")
+    field(INPA, "$(P)CURR CP MSS")
+    field(INPB, "$(P)VOLT CP MSS")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+record(calc, "$(P)RES:CALC") {
+    field(DESC, "Calculated Resistance")
+    field(CALC, "B#0?A/B:0")
+    field(INPA, "$(P)VOLT CP MSS")
+    field(INPB, "$(P)CURR CP MSS")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+############################################################
+
+record(ao, "$(P)POW:TOLERANCE") {
+    field(DESC, "The power tolerance")
+    field(PREC, "2")
+    field(EGU,  "%")
+    field(VAL,  "3.00")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+record(ao, "$(P)DELTAV") {
+    field(DESC, "Amount to adjust voltage by")
+    field(VAL,  "0.1")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL") 
+}
+
+record(bo, "$(P)CONST:POW:SP") {
+    field(DESC, "Constant power mode")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    field(FLNK, "$(P)CONST:POW:CHECK.PROC")
+    info(INTEREST, "MEDIUM")
+    info(ARCHIVE, "VAL")
+}
+
+############################################################
+
+record(calc, "$(P)POW:WITHIN:TOLERANCE") {
+    field(DESC, "Check whether power is within tolerance.")
+    field(INPA, "$(P)POW:CALC CP")
+    field(INPB, "$(P)POW:LOW CP")
+    field(INPC, "$(P)POW:HIGH CP")
+    field(CALC, "(A>=B)&&(A<=C)")
+}
+
+# If const power mode is ON process ADJUST:CHECK PV,
+# adjusting voltage if calculated power is not within tolerance
+record(calcout, "$(P)CONST:POW:CHECK") {
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(OOPT, "When Non-zero")
+    field(INPA, "$(P)CONST:POW:SP")
+    field(CALC, "A")
+    field(OUT,  "$(P)ADJUST:CHECK PP")
+}
+
+# If calculated power is not within tolerance process ADJUST PV,
+# adjusting power, voltage and current limits.
+#
+# (This is triggered once by default on power limit set.)
+record(calcout, "$(P)ADJUST:CHECK") {
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(OOPT, "When Non-zero")
+    field(INPA, "$(P)POW:WITHIN:TOLERANCE")
+    field(CALC, "!A")
+    field(OUT,  "$(P)ADJUST.PROC PP")
+}
+
+record(seq, "$(P)ADJUST") {
+    field(DESC, "Adjust power, voltage and current logic")
+    field(SELM, "All")
+    field(SCAN, "Passive")
+
+    field(DLY0, "0.1")
+    field(DOL0, "$(P)COERCED:PMAX")
+    field(LNK0, "$(P)POW:SP PP")
+
+    field(DLY1, "0.1")
+    field(DOL1, "$(P)VOLT:ADJUST")
+    field(LNK1, "$(P)VOLT:SP PP")
+
+    field(DLY2, "0.1")
+    field(DOL2, "$(P)CURR:ADJUST")
+    field(LNK2, "$(P)CURR:SP PP")
+}
+
+############################################################
+
+### SIMULATION RECORDS ###
+
+############################################################
+
+record(ai, "$(P)SIM:CURR") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(PREC, "0")
+}
+
+record(ao, "$(P)SIM:CURR:SP") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(PREC, "0")
+}
+
+alias("$(P)SIM:CURR:SP", "$(P)SIM:CURR:SP:RBV")
+
+############################################################
+
+record(ai, "$(P)SIM:VOLT") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(PREC, "2")
+}
+
+record(ao, "$(P)SIM:VOLT:SP") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(PREC, "2")
+}
+
+alias("$(P)SIM:VOLT:SP", "$(P)SIM:VOLT:SP:RBV")
+
+############################################################
+
+record(ai, "$(P)SIM:POW") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(PREC, "0")
+}
+
+record(ao, "$(P)SIM:POW:SP") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(PREC, "0")
+}
+
+alias("$(P)SIM:POW:SP", "$(P)SIM:POW:SP:RBV")
+
+############################################################
+
+record(bi, "$(P)SIM:CONST:VOLT") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+}
+
+record(bi, "$(P)SIM:CONST:CURR") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(FLNK, "$(P)CONST:CURR")
+}
+
+record(bi, "$(P)SIM:CONST:POW") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(FLNK, "$(P)CONST:POW")
+}
+
+record(bi, "$(P)SIM:REMOTE") {
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(FLNK, "$(P)REMOTE")
+}
+
+############################################################
+
+record(calc, "$(P)POW:HIGH") {
+    field(DESC, "High Limit for power")
+    field(CALC, "((a/100)+1)*b")
+    field(INPA, "$(P)POW:TOLERANCE CP")
+    field(INPB, "$(P)POW:REQ:SP CP")
+}
+
+record(calc, "$(P)POW:LOW") {
+    field(DESC, "Low Limit for power")
+    field(CALC, "(1-(a/100))*b")
+    field(INPA, "$(P)POW:TOLERANCE CP")
+    field(INPB, "$(P)POW:REQ:SP CP")
+}
+
+record(calc, "$(P)COERCED:POW") {
+    field(DESC, "Coerced Power")
+    field(CALC, "MAX(MIN(a,b),c)")
+    field(INPA, "$(P)POW:CALC CP MS")
+    field(INPB, "$(P)POW:HIGH CP MS")
+    field(INPC, "$(P)POW:LOW CP MS")
+}
+
+record(calc, "$(P)COERCED:PMAX") {
+    field(DESC, "Coerced Power Max")
+    field(CALC, "(FLOOR(a/10)*10)+20")
+    field(INPA, "$(P)POW:CALC CP MS")
+}
+
+record(calc, "$(P)VOLT:ADJUST") {
+    field(DESC, "Calculates the adjusted Voltage")
+    field(SCAN, "Passive")
+    field(CALC, "a>b?c+d:c-d")
+    field(INPA, "$(P)POW:REQ:SP CP MS")
+    field(INPB, "$(P)COERCED:POW CP MS")
+    field(INPC, "$(P)VOLT CP MS")
+    field(INPD, "$(P)DELTAV CP MS")
+}
+
+record(calc, "$(P)CURR:ADJUST") {
+    field(DESC, "Calculates the adjusted Current")
+    field(SCAN, "Passive")
+    field(CALC, "a>b?c+10:c")
+    field(INPA, "$(P)POW:REQ:SP CP MS")
+    field(INPB, "$(P)COERCED:POW CP MS")
+    field(INPC, "$(P)CURR CP MS")
+}
