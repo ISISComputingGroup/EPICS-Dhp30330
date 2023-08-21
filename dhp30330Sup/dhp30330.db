@@ -46,6 +46,7 @@ record(calcout, "$(P)CHECK") {
 ############################################################
 
 record(ai, "$(P)CURR") {
+    field(DESC, "Current")
     field(DTYP, "stream")
     field(SCAN, "2 second")
     field(INP,  "@dhp30330.proto getCurrent $(PORT)")
@@ -68,6 +69,8 @@ record(dfanout, "$(P)CURR:REQ:SP") {
 }
 
 record(ao, "$(P)CURR:SP") {
+    field(DESC, "Current Setpoint")
+    field(EGU, "A")
     field(DTYP, "stream")
     field(OUT,  "@dhp30330.proto setCurrentLimit $(PORT)")
     field(PINI, "YES")
@@ -83,7 +86,9 @@ record(ao, "$(P)CURR:SP") {
 }
 
 record(ai, "$(P)CURR:SP:RBV") {
+    field(DESC, "Current Setpoint RBV")
     field(DTYP, "stream")
+    field(EGU, "A")
     field(SCAN, "2 second")
     field(INP,  "@dhp30330.proto getCurrentLimit $(PORT)")
     field(PREC, "0")
@@ -105,6 +110,7 @@ record(ai, "$(P)CURR:PREV") {
 ############################################################
 
 record(ai, "$(P)VOLT") {
+    field(DESC, "Voltage")
     field(DTYP, "stream")
     field(SCAN, "2 second")
     field(INP,  "@dhp30330.proto getVoltage $(PORT)")
@@ -126,7 +132,9 @@ record(dfanout, "$(P)VOLT:REQ:SP") {
 }
 
 record(ao, "$(P)VOLT:SP") {
+    field(DESC, "Voltage Setpoint")
     field(DTYP, "stream")
+    field(EGU, "V")
     field(OUT,  "@dhp30330.proto setVoltageLimit $(PORT)")
     field(PINI, "YES")
     field(VAL,  "$(DEFAULT_VOLT_LIMIT)")
@@ -141,6 +149,8 @@ record(ao, "$(P)VOLT:SP") {
 }
 
 record(ai, "$(P)VOLT:SP:RBV") {
+    field(DESC, "Voltage Setpoint RBV")
+    field(EGU, "V")
     field(DTYP, "stream")
     field(SCAN, "2 second")
     field(INP,  "@dhp30330.proto getVoltageLimit $(PORT)")
@@ -162,6 +172,7 @@ record(ai, "$(P)VOLT:PREV") {
 ############################################################
 
 record(ai, "$(P)POW") {
+    field(DESC, "Power")
     field(DTYP, "stream")
     field(SCAN, "2 second")
     field(INP,  "@dhp30330.proto getPower $(PORT)")
@@ -183,7 +194,9 @@ record(dfanout, "$(P)POW:REQ:SP") {
 }
 
 record(ao, "$(P)POW:SP") {
+    field(DESC, "Power Setpoint")
     field(DTYP, "stream")
+    field(EGU, "W")
     field(OUT,  "@dhp30330.proto setPowerLimit $(PORT)")
     field(PINI, "YES")
     field(VAL,  "$(DEFAULT_POW_LIMIT)")
@@ -198,7 +211,9 @@ record(ao, "$(P)POW:SP") {
 }
 
 record(ai, "$(P)POW:SP:RBV") {
+    field(DESC, "Power Setpoint RBV")
     field(DTYP, "stream")
+    field(EGU, "W")
     field(SCAN, "2 second")
     field(INP,  "@dhp30330.proto getPowerLimit $(PORT)")
     field(PREC, "0")
@@ -221,7 +236,6 @@ record(bi, "$(P)CONST:VOLT") {
     field(SIML, "$(P)SIM")
     field(SIOL, "$(P)SIM:CONST:VOLT")
     field(SDIS, "$(P)DISABLE")
-    info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
 }
 
@@ -231,7 +245,6 @@ record(bi, "$(P)CONST:CURR") {
     field(SIML, "$(P)SIM")
     field(SIOL, "$(P)SIM:CONST:CURR")
     field(SDIS, "$(P)DISABLE")
-    info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
 }
 
@@ -241,11 +254,11 @@ record(bi, "$(P)CONST:POW") {
     field(SIML, "$(P)SIM")
     field(SIOL, "$(P)SIM:CONST:POW")
     field(SDIS, "$(P)DISABLE")
-    info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
 }
 
 record(bi, "$(P)REMOTE") {
+    field(DESC, "In Remote Mode?")
     field(ZNAM, "NO")
     field(ONAM, "YES")
     field(SIML, "$(P)SIM")
@@ -262,6 +275,7 @@ record(calc, "$(P)POW:CALC") {
     field(CALC, "a*b")
     field(INPA, "$(P)CURR CP MSS")
     field(INPB, "$(P)VOLT CP MSS")
+	field(ASG, "READONLY")
     info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
 }
@@ -271,6 +285,7 @@ record(calc, "$(P)RES:CALC") {
     field(CALC, "B#0?A/B:0")
     field(INPA, "$(P)VOLT CP MSS")
     field(INPB, "$(P)CURR CP MSS")
+	field(ASG, "READONLY")
     info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
 }
@@ -289,6 +304,7 @@ record(ao, "$(P)POW:TOLERANCE") {
 record(ao, "$(P)DELTAV") {
     field(DESC, "Amount to adjust voltage by")
     field(VAL,  "0.1")
+	field(EGU, "V")
     info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL") 
 }
