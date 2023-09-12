@@ -313,6 +313,8 @@ record(bo, "$(P)CONST:POW:SP") {
     field(FLNK, "$(P)CONST:POW:CHECK.PROC")
     info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
+	field(DTYP, "stream")
+	field(OUT, "@dhp30330.proto getInitConstPower $(PORT)")
 }
 
 ############################################################

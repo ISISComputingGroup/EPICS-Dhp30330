@@ -50,3 +50,11 @@ setVoltageLimit {
 setPowerLimit {
     out "SOUR:POW %-5.2f";
 }
+
+getInitConstPower {
+    out "";
+    @init {
+	    out "DIAG:DISP:IND?";
+        in "%*d,%*d,%d,%*d";
+    } 
+}
