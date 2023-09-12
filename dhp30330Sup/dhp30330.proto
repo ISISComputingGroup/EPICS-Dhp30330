@@ -1,47 +1,40 @@
-Terminator = CR;
+Terminator = LF;
 
 ############################################################
 
 getCurrent {
     out "MEAS:CURR?";
     in "%f";
-    ExtraInput = Ignore;
 }
 
 getCurrentLimit {
     out "SOUR:CURR?";
     in "%f";
-    ExtraInput = Ignore;
 }
 
 getVoltage {
     out "MEAS:VOLT?";
     in "%f";
-    ExtraInput = Ignore;
 }
 
 getVoltageLimit {
     out "SOUR:VOLT?";
     in "%f";
-    ExtraInput = Ignore;
 }
 
 getPower {
     out "MEAS:POW?";
     in "%f";
-    ExtraInput = Ignore;
 }
 
 getPowerLimit {
     out "SOUR:POW?";
     in "%f";
-    ExtraInput = Ignore;
 }
 
 getStatus {
     out "DIAG:DISP:IND?";
     in "%d,%(\$1\$2)d,%(\$1\$3)d,%(\$1\$4)d";
-    ExtraInput = Ignore;
 }
 
 ############################################################
