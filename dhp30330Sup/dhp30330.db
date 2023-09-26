@@ -63,8 +63,7 @@ record(ai, "$(P)CURR") {
 
 record(dfanout, "$(P)CURR:REQ:SP") {
     field(DESC, "Requested Current Limit setpoint")
-    field(OMSL, "Supervisory")
-    field(SELM, "All")
+    field(OMSL, "supervisory")
     field(OUTA, "$(P)CURR:SP PP")
 }
 
@@ -125,8 +124,7 @@ record(ai, "$(P)VOLT") {
 
 record(dfanout, "$(P)VOLT:REQ:SP") {
     field(DESC, "Requested Voltage Limit setpoint")
-    field(OMSL, "Supervisory")
-    field(SELM, "All")
+    field(OMSL, "supervisory")
     field(PREC, "2")
     field(OUTA, "$(P)VOLT:SP PP")
 }
@@ -187,8 +185,7 @@ record(ai, "$(P)POW") {
 
 record(dfanout, "$(P)POW:REQ:SP") {
     field(DESC, "Requested Power Limit setpoint")
-    field(OMSL, "Supervisory")
-    field(SELM, "All")
+    field(OMSL, "supervisory")
     field(OUTA, "$(P)POW:SP PP")
     field(FLNK, "$(P)ADJUST:CHECK")
 }
@@ -316,6 +313,8 @@ record(bo, "$(P)CONST:POW:SP") {
     field(FLNK, "$(P)CONST:POW:CHECK.PROC")
     info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
+	field(DTYP, "stream")
+	field(OUT, "@dhp30330.proto getInitConstPower $(PORT)")
 }
 
 ############################################################
