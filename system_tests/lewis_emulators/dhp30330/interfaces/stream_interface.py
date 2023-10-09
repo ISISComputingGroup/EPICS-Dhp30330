@@ -7,8 +7,8 @@ from lewis.utils.replies import conditional_reply
 @has_log
 class Dhp30330StreamInterface(StreamInterface):
     
-    in_terminator = "\r"
-    out_terminator = "\r"
+    in_terminator = "\n"
+    out_terminator = "\n"
 
     def __init__(self):
         super(Dhp30330StreamInterface, self).__init__()
