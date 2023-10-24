@@ -275,6 +275,7 @@ record(calc, "$(P)POW:CALC") {
 	field(ASG, "READONLY")
     info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
+    field(PREC, "6")
 }
 
 record(calc, "$(P)RES:CALC") {
@@ -285,6 +286,7 @@ record(calc, "$(P)RES:CALC") {
 	field(ASG, "READONLY")
     info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
+    field(PREC, "6")
 }
 
 ############################################################
