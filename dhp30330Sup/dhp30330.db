@@ -36,11 +36,8 @@ record(calcout, "$(P)CHECK") {
     field(OOPT, "When Non-zero")
     field(INPA, "$(P)CURR")
     field(INPB, "$(P)VOLT")
-    field(INPC, "$(P)CURR:PREV")
-    field(INPD, "$(P)VOLT:PREV")
-    field(CALC, "(C#0)&&(D#0)&&((A<(C*0.5))||(A>(C*2))||(B<(D*0.5))||(B>(D*2)))")
+    field(CALC, "(LA#0)&&(LB#0)&&((A<(LA*0.5))||(A>(LA*2))||(B<(LB*0.5))||(B>(LB*2)))")
     field(OUT,  "$(P)STOP.PROC PP")
-    field(FLNK, "$(P)CURR:PREV PP")
 }
 
 ############################################################
@@ -98,14 +95,6 @@ record(ai, "$(P)CURR:SP:RBV") {
     info(ARCHIVE, "VAL")
 }
 
-record(ai, "$(P)CURR:PREV") {
-    field(DTYP, "Soft Channel")
-    field(SCAN, "Passive")
-    field(INP, "$(P)CHECK.A")
-    field(PREC, "0")
-    field(FLNK, "$(P)VOLT:PREV PP")
-}
-
 ############################################################
 
 record(ai, "$(P)VOLT") {
@@ -158,13 +147,6 @@ record(ai, "$(P)VOLT:SP:RBV") {
     field(SDIS, "$(P)DISABLE")
     info(INTEREST, "MEDIUM")
     info(ARCHIVE, "VAL")
-}
-
-record(ai, "$(P)VOLT:PREV") {
-    field(DTYP, "Soft Channel")
-    field(SCAN, "Passive")
-    field(INP, "$(P)CHECK.B")
-    field(PREC, "2")
 }
 
 ############################################################
