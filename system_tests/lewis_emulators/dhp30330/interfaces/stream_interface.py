@@ -80,4 +80,8 @@ class Dhp30330StreamInterface(StreamInterface):
     @conditional_reply("connected")
     def set_power_sp(self, value):
         self.device.power_sp = value
+        if value > 0:
+            self.device.constant_power = 1
+        else:
+            self.device.constant_power = 0
         return ""

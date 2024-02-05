@@ -56,6 +56,7 @@ class Dhp30330Tests(unittest.TestCase):
             self.ca.set_pv_value(f"SIM:CONST:VOLT", 0)
             self.ca.set_pv_value(f"SIM:CONST:CURR", 0)
             self.ca.set_pv_value(f"SIM:CONST:POW", 0)
+            self.ca.set_pv_value(f"SIM:CONST:POW:SP", 0)
             self.ca.set_pv_value(f"SIM:REMOTE", 0)
         else:
             self._lewis.backdoor_run_function_on_device("reset")
@@ -184,13 +185,12 @@ class Dhp30330Tests(unittest.TestCase):
         (120, 5.4, 600, 120, 5.1, 640),  # Power needs adjusting down
     ]))
     def test_GIVEN_const_power_mode_on_WHEN_calculated_power_out_of_range_THEN_voltage_and_current_adjusted(self, _, curr, volt, power_limit, expected_curr_limit, expected_volt_limit, expected_power_limit):
+
         self.ca.set_pv_value("CURR:REQ:SP", curr)
         self.ca.set_pv_value("VOLT:REQ:SP", volt)
         self._set("CURR", curr)
         self._set("VOLT", volt)
         
-        time.sleep(5)  # wait for curr, volt set to propagate before setting pow limit which by default triggers a single adjustment
-
         self.ca.set_pv_value("POW:REQ:SP", power_limit)
 
         time.sleep(2)
