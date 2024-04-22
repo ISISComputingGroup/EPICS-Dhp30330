@@ -61,6 +61,8 @@ class Dhp30330Tests(unittest.TestCase):
         else:
             self._lewis.backdoor_run_function_on_device("reset")
 
+        self.ca.set_pv_value("CONST:POW:SP", 0)
+
         time.sleep(5) # Wait for all periodic scan PVs to process.
 
     def _set(self, pv, value):
