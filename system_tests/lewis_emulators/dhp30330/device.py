@@ -6,7 +6,6 @@ from .states import DefaultState
 
 
 class SimulatedDhp30330(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -14,7 +13,7 @@ class SimulatedDhp30330(StateMachineDevice):
         self.reset()
 
     def _get_state_handlers(self):
-        return { "default": DefaultState() }
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
         return "default"
@@ -31,7 +30,7 @@ class SimulatedDhp30330(StateMachineDevice):
         self.current_sp = 0
         self.voltage_sp = 0.0
         self.power_sp = 0
-        self.constant_voltage = 0 # First status character.
-        self.constant_current = 0 # Second status character.
-        self.constant_power = 0   # Third status character.
-        self.remote = 0           # Fourth status character.
+        self.constant_voltage = 0  # First status character.
+        self.constant_current = 0  # Second status character.
+        self.constant_power = 0  # Third status character.
+        self.remote = 0  # Fourth status character.
