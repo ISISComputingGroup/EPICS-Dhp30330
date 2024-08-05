@@ -1,12 +1,11 @@
-import unittest
 import time
-from parameterized import parameterized
+import unittest
 
+from parameterized import parameterized
 from utils.channel_access import ChannelAccess
-from utils.ioc_launcher import get_default_ioc_dir, IOCRegister, ProcServLauncher
+from utils.ioc_launcher import IOCRegister, ProcServLauncher, get_default_ioc_dir
 from utils.test_modes import TestModes
 from utils.testing import get_running_lewis_and_ioc, parameterized_list, skip_if_recsim
-
 
 DEVICE_PREFIX = "DHP30330_01"
 
@@ -47,17 +46,17 @@ class Dhp30330Tests(unittest.TestCase):
 
     def _reset_device(self):
         if IOCRegister.uses_rec_sim:
-            self.ca.set_pv_value(f"SIM:CURR", 0)
-            self.ca.set_pv_value(f"SIM:CURR:SP", 0)
-            self.ca.set_pv_value(f"SIM:VOLT", 0.0)
-            self.ca.set_pv_value(f"SIM:VOLT:SP", 0.0)
-            self.ca.set_pv_value(f"SIM:POW", 0)
-            self.ca.set_pv_value(f"SIM:POW:SP", 0)
-            self.ca.set_pv_value(f"SIM:CONST:VOLT", 0)
-            self.ca.set_pv_value(f"SIM:CONST:CURR", 0)
-            self.ca.set_pv_value(f"SIM:CONST:POW", 0)
-            self.ca.set_pv_value(f"SIM:CONST:POW:SP", 0)
-            self.ca.set_pv_value(f"SIM:REMOTE", 0)
+            self.ca.set_pv_value("SIM:CURR", 0)
+            self.ca.set_pv_value("SIM:CURR:SP", 0)
+            self.ca.set_pv_value("SIM:VOLT", 0.0)
+            self.ca.set_pv_value("SIM:VOLT:SP", 0.0)
+            self.ca.set_pv_value("SIM:POW", 0)
+            self.ca.set_pv_value("SIM:POW:SP", 0)
+            self.ca.set_pv_value("SIM:CONST:VOLT", 0)
+            self.ca.set_pv_value("SIM:CONST:CURR", 0)
+            self.ca.set_pv_value("SIM:CONST:POW", 0)
+            self.ca.set_pv_value("SIM:CONST:POW:SP", 0)
+            self.ca.set_pv_value("SIM:REMOTE", 0)
         else:
             self._lewis.backdoor_run_function_on_device("reset")
 
